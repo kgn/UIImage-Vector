@@ -22,23 +22,34 @@
 }
 
 + (UIImage *)iconWithFont:(UIFont *)font named:(NSString *)iconNamed withTintColor:(UIColor *)tintColor clipToBounds:(BOOL)clipToBounds forSize:(CGFloat)fontSize{
-    NSString *identifier = [NSString stringWithFormat:@"%@%@%@%d%f", font.fontName, tintColor, iconNamed, clipToBounds, fontSize];
+    NSString *identifier = [NSString stringWithFormat:@"%@%@%@%@%d%f", NSStringFromSelector(_cmd), font.fontName, tintColor, iconNamed, clipToBounds, fontSize];
     UIImage *image = [[self cache] objectForKey:identifier];
     if(image == nil){
         NSMutableAttributedString *ligature = [[NSMutableAttributedString alloc] initWithString:iconNamed];
-        [ligature setAttributes:@{(NSString *)kCTForegroundColorAttributeName: tintColor ?: [UIColor blackColor],
-                                  (NSString *)kCTLigatureAttributeName: @(2),
+        [ligature setAttributes:@{(NSString *)kCTLigatureAttributeName: @(2),
                                   (NSString *)kCTFontAttributeName: font}
                           range:NSMakeRange(0, [ligature length])];
 
-        CGSize iconSize = [ligature size];
-        iconSize.width = ceil(iconSize.width);
-        iconSize.height = ceil(iconSize.height);
-        if(!CGSizeEqualToSize(CGSizeZero, iconSize)){
-            UIGraphicsBeginImageContextWithOptions(iconSize, NO, 0);
+        CGSize imageSize = [ligature size];
+        imageSize.width = ceil(imageSize.width);
+        imageSize.height = ceil(imageSize.height);
+        if(!CGSizeEqualToSize(CGSizeZero, imageSize)){
+            UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
             [ligature drawAtPoint:CGPointZero];
             image = UIGraphicsGetImageFromCurrentImageContext();
             UIGraphicsEndImageContext();
+
+            if(tintColor){
+                UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
+                CGContextRef context = UIGraphicsGetCurrentContext();
+                CGContextScaleCTM(context, 1, -1);
+                CGContextTranslateCTM(context, 0, -imageSize.height);
+                CGContextClipToMask(context, (CGRect){CGPointZero, imageSize}, [image CGImage]);
+                [tintColor setFill];
+                CGContextFillRect(context, (CGRect){CGPointZero, imageSize});
+                image = UIGraphicsGetImageFromCurrentImageContext();
+                UIGraphicsEndImageContext();
+            }
 
             if(clipToBounds){
                 image = [image imageClippedToPixelBounds];
@@ -51,7 +62,7 @@
 }
 
 + (UIImage *)imageWithPDFNamed:(NSString *)pdfNamed withTintColor:(UIColor *)tintColor forHeight:(CGFloat)height{
-    NSString *identifier = BBlockImageIdentifier(@"%@%@%f", pdfNamed, tintColor, height);
+    NSString *identifier = [NSString stringWithFormat:@"%@%@%@%f", NSStringFromSelector(_cmd), pdfNamed, tintColor, height];
     UIImage *image = [[self cache] objectForKey:identifier];
     if(image){
         return image;
@@ -66,13 +77,13 @@
     CGPDFPageRef page1 = CGPDFDocumentGetPage(pdf, 1);
     CGRect mediaRect = CGPDFPageGetBoxRect(page1, kCGPDFCropBox);
     CGFloat scaleFactor = height/CGRectGetHeight(mediaRect);
-    CGSize size = CGSizeMake(CGRectGetWidth(mediaRect)*scaleFactor, height);
+    CGSize imageSize = CGSizeMake(CGRectGetWidth(mediaRect)*scaleFactor, height);
 
-    UIGraphicsBeginImageContextWithOptions(size, NO, 0);
-    CGFloat scale = MIN(size.width / mediaRect.size.width, size.height / mediaRect.size.height);
+    UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
+    CGFloat scale = MIN(imageSize.width / mediaRect.size.width, imageSize.height / mediaRect.size.height);
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextScaleCTM(context, 1, -1);
-    CGContextTranslateCTM(context, 0, -size.height);
+    CGContextTranslateCTM(context, 0, -imageSize.height);
     CGContextScaleCTM(context, scale, scale);
     CGContextDrawPDFPage(context, page1);
     CGPDFDocumentRelease(pdf);
@@ -80,16 +91,18 @@
     UIGraphicsEndImageContext();
 
     if(tintColor){
-        UIGraphicsBeginImageContextWithOptions(size, NO, 0);
+        UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
         CGContextRef context = UIGraphicsGetCurrentContext();
         CGContextScaleCTM(context, 1, -1);
-        CGContextTranslateCTM(context, 0, -size.height);
-        CGContextClipToMask(context, (CGRect){CGPointZero, size}, [pdfImage CGImage]);
-        [tintColor set];
-        CGContextFillRect(context, (CGRect){CGPointZero, size});
+        CGContextTranslateCTM(context, 0, -imageSize.height);
+        CGContextClipToMask(context, (CGRect){CGPointZero, imageSize}, [image CGImage]);
+        [tintColor setFill];
+        CGContextFillRect(context, (CGRect){CGPointZero, imageSize});
         image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
     }
+
+    return image;
 }
 
 @end
