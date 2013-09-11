@@ -8,7 +8,6 @@
 
 #import "UIImage+Vector.h"
 #import <CoreText/CoreText.h>
-#import "KGPixelBoundsClip.h"
 
 @implementation UIImage(Vector)
 
@@ -51,9 +50,12 @@
                 UIGraphicsEndImageContext();
             }
 
-            if(clipToBounds){
-                image = [image imageClippedToPixelBounds];
+            #pragma clang diagnostic push
+            #pragma clang diagnostic ignored "-Wundeclared-selector"
+            if(clipToBounds && [image respondsToSelector:@selector(imageClippedToPixelBounds)]){
+                image = [image performSelector:@selector(imageClippedToPixelBounds)];
             }
+            #pragma clang diagnostic pop
 
             [[self cache] setObject:image forKey:identifier];
         }
