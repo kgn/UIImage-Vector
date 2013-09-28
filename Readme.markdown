@@ -7,6 +7,7 @@ UIImage category for dealing with vector formats like PDF and icon fonts.
 Use an icon font PDF:
 
 ``` objc
+UIFont *font = [UIFont fontWithName:@"MyIconFont" size:28.0f];
 UIImage *gear = [UIImage iconWithFont:font named:@"g"
                         withTintColor:[UIColor whiteColor] clipToBounds:NO forSize:28.0f];
 ```
@@ -14,5 +15,10 @@ UIImage *gear = [UIImage iconWithFont:font named:@"g"
 Use a PDF:
 
 ``` objc
-UIImage *gear = [UIImage imageWithPDFNamed:@"gear" withTintColor:[UIColor whiteColor] forHeight:28.0f];
+UIImage *gear = [UIImage imageWithPDFNamed:@"gear"
+                             withTintColor:[UIColor whiteColor] forHeight:28.0f];
 ```
+
+## Installation
+
+Simply add the files in `UIImage-Vector` to your project and link `CoreText.framework`.
