@@ -25,6 +25,14 @@
 /**
  Create a UIImage from a PDF icon.
  @param pdfNamed The name of the PDF file in the application's resources directory.
+ @param height The height of the resulting image, the width will be based on the aspect ratio of the PDF.
+ @return The resulting image.
+ */
++ (UIImage *)imageWithPDFNamed:(NSString *)pdfNamed forHeight:(CGFloat)height;
+
+/**
+ Create a UIImage from a PDF icon.
+ @param pdfNamed The name of the PDF file in the application's resources directory.
  @param tintColor The tint color to use for the icon. If nil no tint color will be used.
  @param height The height of the resulting image, the width will be based on the aspect ratio of the PDF.
  @return The resulting image.

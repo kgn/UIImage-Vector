@@ -43,9 +43,9 @@
                 CGContextRef context = UIGraphicsGetCurrentContext();
                 CGContextScaleCTM(context, 1, -1);
                 CGContextTranslateCTM(context, 0, -imageSize.height);
-                CGContextClipToMask(context, (CGRect){CGPointZero, imageSize}, [image CGImage]);
+                CGContextClipToMask(context, (CGRect){.size=imageSize}, [image CGImage]);
                 [tintColor setFill];
-                CGContextFillRect(context, (CGRect){CGPointZero, imageSize});
+                CGContextFillRect(context, (CGRect){.size=imageSize});
                 image = UIGraphicsGetImageFromCurrentImageContext();
                 UIGraphicsEndImageContext();
             }
@@ -61,6 +61,10 @@
         }
     }
     return image;
+}
+
++ (UIImage *)imageWithPDFNamed:(NSString *)pdfNamed forHeight:(CGFloat)height{
+    return [self imageWithPDFNamed:pdfNamed withTintColor:nil forHeight:height];
 }
 
 + (UIImage *)imageWithPDFNamed:(NSString *)pdfNamed withTintColor:(UIColor *)tintColor forHeight:(CGFloat)height{
@@ -97,9 +101,9 @@
         CGContextRef context = UIGraphicsGetCurrentContext();
         CGContextScaleCTM(context, 1, -1);
         CGContextTranslateCTM(context, 0, -imageSize.height);
-        CGContextClipToMask(context, (CGRect){CGPointZero, imageSize}, [image CGImage]);
+        CGContextClipToMask(context, (CGRect){.size=imageSize}, [image CGImage]);
         [tintColor setFill];
-        CGContextFillRect(context, (CGRect){CGPointZero, imageSize});
+        CGContextFillRect(context, (CGRect){.size=imageSize});
         image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
     }
