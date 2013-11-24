@@ -68,13 +68,19 @@
 }
 
 + (UIImage *)imageWithPDFNamed:(NSString *)pdfNamed withTintColor:(UIColor *)tintColor forHeight:(CGFloat)height{
-    NSString *identifier = [NSString stringWithFormat:@"%@%@%@%f", NSStringFromSelector(_cmd), pdfNamed, tintColor, height];
+    NSString *pdfFile = [[NSBundle mainBundle] pathForResource:pdfNamed ofType:@"pdf"];
+    return [self imageWithPDFFile:pdfFile withTintColor:tintColor forSize:CGSizeMake(MAXFLOAT, height)];
+}
+
++ (UIImage *)imageWithPDFFile:(NSString *)pdfFile withTintColor:(UIColor *)tintColor forSize:(CGSize)size{
+    NSString *identifier = [NSString stringWithFormat:@"%@%@%@%@", NSStringFromSelector(_cmd), pdfFile, tintColor, NSStringFromCGSize(size)];
     UIImage *image = [[self cache] objectForKey:identifier];
     if(image){
         return image;
     }
 
-    NSURL *url = [[NSBundle mainBundle] URLForResource:pdfNamed withExtension:@"pdf"];
+    NSURL *url = [NSURL fileURLWithPath:pdfFile];
+    NSLog(@"pdfFile: %@", pdfFile);
     CGPDFDocumentRef pdf = CGPDFDocumentCreateWithURL((__bridge CFURLRef)url);
     if(!pdf){
         return nil;
@@ -82,11 +88,29 @@
 
     CGPDFPageRef page1 = CGPDFDocumentGetPage(pdf, 1);
     CGRect mediaRect = CGPDFPageGetBoxRect(page1, kCGPDFCropBox);
-    CGFloat scaleFactor = height/CGRectGetHeight(mediaRect);
-    CGSize imageSize = CGSizeMake(CGRectGetWidth(mediaRect)*scaleFactor, height);
 
+    CGSize imageSize = mediaRect.size;
+    if(imageSize.height < size.height && size.height != MAXFLOAT){
+        imageSize.width = round(size.height/imageSize.height*imageSize.width);
+        imageSize.height = size.height;
+    }
+    if(imageSize.width < size.width && size.width != MAXFLOAT){
+        imageSize.height = round(size.width/imageSize.width*imageSize.height);
+        imageSize.width = size.width;
+    }
+
+    if(imageSize.height > size.height){
+        imageSize.width = round(size.height/imageSize.height*imageSize.width);
+        imageSize.height = size.height;
+    }
+    if(imageSize.width > size.width){
+        imageSize.height = round(size.width/imageSize.width*imageSize.height);
+        imageSize.width = size.width;
+    }
+
+    NSLog(@"imageSize: %@", NSStringFromCGSize(imageSize));
     UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
-    CGFloat scale = MIN(imageSize.width / mediaRect.size.width, imageSize.height / mediaRect.size.height);
+    CGFloat scale = MIN(imageSize.width/mediaRect.size.width, imageSize.height/mediaRect.size.height);
     CGContextRef context = UIGraphicsGetCurrentContext();
     CGContextScaleCTM(context, 1, -1);
     CGContextTranslateCTM(context, 0, -imageSize.height);
