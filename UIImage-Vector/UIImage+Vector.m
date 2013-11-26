@@ -80,7 +80,6 @@
     }
 
     NSURL *url = [NSURL fileURLWithPath:pdfFile];
-    NSLog(@"pdfFile: %@", pdfFile);
     CGPDFDocumentRef pdf = CGPDFDocumentCreateWithURL((__bridge CFURLRef)url);
     if(!pdf){
         return nil;
@@ -108,7 +107,6 @@
         imageSize.width = size.width;
     }
 
-    NSLog(@"imageSize: %@", NSStringFromCGSize(imageSize));
     UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
     CGFloat scale = MIN(imageSize.width/mediaRect.size.width, imageSize.height/mediaRect.size.height);
     CGContextRef context = UIGraphicsGetCurrentContext();
