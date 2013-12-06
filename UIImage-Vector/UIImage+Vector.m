@@ -73,6 +73,10 @@
 }
 
 + (UIImage *)imageWithPDFFile:(NSString *)pdfFile withTintColor:(UIColor *)tintColor forSize:(CGSize)size{
+    if(!pdfFile || CGSizeEqualToSize(size, CGSizeZero)){
+        return nil;
+    }
+
     NSString *identifier = [NSString stringWithFormat:@"%@%@%@%@", NSStringFromSelector(_cmd), pdfFile, tintColor, NSStringFromCGSize(size)];
     UIImage *image = [[self cache] objectForKey:identifier];
     if(image){
