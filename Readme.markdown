@@ -4,7 +4,7 @@ UIImage category for dealing with vector formats like PDF and icon fonts.
 
 ## Usage
 
-Use an icon font PDF:
+Use an icon font:
 
 ``` objc
 UIFont *font = [UIFont fontWithName:@"MyIconFont" size:28.0f];
