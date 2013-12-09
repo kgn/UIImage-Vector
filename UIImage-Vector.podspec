@@ -10,5 +10,5 @@ Pod::Spec.new do |spec|
   spec.platform = :ios
   spec.requires_arc = true
   spec.frameworks = 'UIKit', 'CoreText'
-  spec.source_files = 'UIImage-Vector'
+  spec.source_files = 'UIImage+Vector'
 end
