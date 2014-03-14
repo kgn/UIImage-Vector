@@ -8,7 +8,7 @@ Use an icon font:
 
 ``` objc
 UIFont *font = [UIFont fontWithName:@"MyIconFont" size:28.0f];
-UIImage *gear = [UIImage iconWithFont:font named:@"g"
+UIImage *gear = [UIImage iconWithFont:font named:@"gear"
                         withTintColor:[UIColor whiteColor] clipToBounds:NO forSize:28.0f];
 ```
 
