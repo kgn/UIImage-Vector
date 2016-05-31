@@ -134,6 +134,8 @@
         UIGraphicsEndImageContext();
     }
 
+	[[self cache] setObject:image forKey:identifier];
+
     return image;
 }
 
